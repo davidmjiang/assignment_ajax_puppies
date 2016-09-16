@@ -2,6 +2,7 @@ $(document).ready(function() {
   APP.formListener();
   APP.getBreeds();
   APP.updatePuppies();
+  APP.deletePuppy();
 })
 
 var APP = APP || {};
@@ -41,7 +42,7 @@ APP.getCreatedDistance = function(puppy) {
 APP.buildPuppyItem = function(puppy) {
   var distance = APP.getCreatedDistance(puppy);
   var text = puppy.name + " (" + puppy.breed.name + ") " + "created " + distance + " minutes ago";
-  return $("<li>").text(text);
+  return $("<li>").text(text).attr("data-id", puppy.id);
 };
 
 APP.getBreeds = function() {
@@ -92,3 +93,35 @@ APP.buildPuppiesSuccess = function(puppy, breedName) {
   var puppyItem = APP.buildPuppyItem(puppy);
   $('#puppy-list').prepend(puppyItem);
 };
+
+APP.buildPuppiesError = function(xhr, status, errorThrown){
+  $('#status').text(errorThrown);
+};
+
+APP.deletePuppy = function(){
+  $("#puppy-list").on("click", ".adopt-link", function(e){
+    e.preventDefault();
+    var parent = $($(e.target).parent());
+    var puppy_id = parent.attr("data-id");
+    $.ajax("https://ajax-puppies.herokuapp.com/puppies/"+puppy_id+".json",
+        {type: "DELETE",
+         async: true,
+         dataType: "json",
+         success: function(){
+            parent.remove();
+          },
+         error: APP.fakeError,
+         contentType: 'application/json'
+  });
+  })
+}
+
+
+
+
+
+
+
+
+
+
