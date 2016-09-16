@@ -76,6 +76,7 @@ APP.buildPuppy = function(e) {
   var breed = $('#breeds').find(":selected").val();
   var breedName = $('#breeds').find(":selected").text();
   $('#breeds').val('');
+
   $.ajax("https://ajax-puppies.herokuapp.com/puppies.json",
         {type: "POST",
          async: true,
