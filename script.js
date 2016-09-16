@@ -1,6 +1,8 @@
 $(document).ready(function() {
   APP.formListener();
-  APP.getBreeds();
+  APP.getBreeds().then(function() {
+    setTimeout(APP.listenHere, 1)
+  });
   APP.updatePuppies();
   APP.deletePuppy();
 })
@@ -23,7 +25,6 @@ APP.getPuppies = function(e){
 };
 
 APP.getPuppiesSuccess = function(object){
-  console.log('hello');
   var list = $('#puppy-list');
   list.html('');
   object.forEach(function(puppy){
@@ -46,7 +47,7 @@ APP.buildPuppyItem = function(puppy) {
 };
 
 APP.getBreeds = function() {
-  $.ajax("https://ajax-puppies.herokuapp.com/breeds.json",
+  return $.ajax("https://ajax-puppies.herokuapp.com/breeds.json",
         {type: "GET",
          async: true,
          dataType: "json",
@@ -92,6 +93,7 @@ APP.buildPuppiesSuccess = function(puppy, breedName) {
   puppy.breed = {name: breedName}
   var puppyItem = APP.buildPuppyItem(puppy);
   $('#puppy-list').prepend(puppyItem);
+  puppyItem.append("<a href='#' class='adopt-link'>Adopt Me!</a>");
 };
 
 APP.buildPuppiesError = function(xhr, status, errorThrown){
@@ -116,12 +118,26 @@ APP.deletePuppy = function(){
   })
 }
 
+APP.listenHere = function() {
+  $document = $(document);
+  $status = $('#status2');
+  var time;
 
+  $document.ajaxStart(function() {
+    $status.css('background', 'yellow').text('waiting').show();
+    time = setTimeout(function() {
+      $status.text('sorry this is taking so long')
+    }, 1000);
+  });
 
+  $document.ajaxSuccess(function() {
+    $status.css('background', 'green').text('finished').fadeOut(2000);
+    clearTimeout(time);
+  });
 
+  $document.ajaxError(function(e) {
+    $status.css('background', 'red').text('failed').fadeOut(2000);
+    clearTimeout(time);
+  });
 
-
-
-
-
-
+}
